@@ -1,84 +1,103 @@
+from tranco import Tranco
 import requests
 import json
 import logging
-import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import os
+import time
+
+# setup logging
 logging.basicConfig(level=logging.INFO)
-#logging.basicConfig(level=logging.DEBUG)
 
+# configuration
+TOPX = 10000  # number of top domains to process from Tranco list
+OUTPUT_FILE = "mcp_results.jsonl"  # each line is a JSON object
+MAX_WORKERS = 32
 
+def check_mcp_json(domain):
+    """
+    Checks for the presence of a .well-known/mcp.json file on the given domain and www subdomain.
 
-# function to scan for .well-known/mcp.json
-def fetch_mcp_json(host):
-    mcp_url = f"https://{host}/.well-known/mcp.json"
+    Returns:
+        List[dict]: Each dict contains:
+            - domain (str): The domain used for the request (domain or www.domain).
+            - mcp_url (str): The URL where mcp.json was found.
+            - mcp (dict): The parsed JSON content of mcp.json
+    """
+    for host in [domain, f"www.{domain}"]:
+        mcp_url = f"https://{host}/.well-known/mcp.json"
+        try:
+            resp = requests.get(
+                mcp_url,
+                timeout=2,
+                allow_redirects=True,
+                headers={"Accept": "application/json, */*;q=0.7", "User-Agent": "mcp-check/0.1"}
+            )
+        except requests.RequestException as e:
+            logging.debug(f"{mcp_url} request error: {e}")
+            continue
 
-    try:
-        http_response = requests.get(
-            mcp_url, 
-            timeout=5, 
-            allow_redirects=True,
-            headers={"Accept": "application/json, */*;q=0.7", "User-Agent": "mcp-check/0.1"},
-        )
-    
-    except requests.RequestException as e:
-        logging.debug(f"{mcp_url} request error: {e}")
-        return None
+        if resp.status_code != 200:
+            logging.debug(f"No mcp.json at {mcp_url} (status {resp.status_code})")
+            continue
 
-    if http_response.status_code != 200:
-        logging.debug(f"No mcp.json (status {http_response.status_code})")
-        return None
+        content_type = (resp.headers.get("Content-Type") or "").lower()
+        body = resp.content
+        body_snippet = body[:512].strip()
 
-    return http_response
+        # heuristic check for HTML content in body
+        looks_like_html = body_snippet.startswith(b"<html") or body_snippet.startswith(b"<!doctype html")
+        if looks_like_html:
+            logging.debug(f"{mcp_url} looks like HTML, skipping")
+            continue
 
-# function to validate and parse mcp.json
-def validate_and_parse_mcp_json(http_response):
+        # heuristic check for JSON content in body
+        looks_like_json = body_snippet.startswith(b"{") or body_snippet.startswith(b"[")
+        if "json" not in content_type and not looks_like_json:
+            logging.debug(f"{mcp_url} content-type is not JSON ({content_type}), skipping")
+            continue
 
-    # quick checks to avoid HTML masquerading as JSON
-    content_type = (http_response.headers.get("Content-Type") or "").lower()
-    content = http_response.content
+        try:
+            mcp_data = resp.json()
+        except (ValueError, requests.exceptions.JSONDecodeError):
+            logging.debug(f"Response from {mcp_url} is not valid JSON")
+            continue
 
-    # heuristic check for HTML content in body
-    body_snippet = content[:512].lstrip().lower()
-    looks_like_html = body_snippet.startswith(b"<html") or body_snippet.startswith(b"<!doctype html")
+        # immediately return upon finding the first valid mcp.json
+        logging.info(f"Found valid mcp.json at {mcp_url}")
+        return {
+            "domain": domain,
+            "mcp_url": mcp_url,
+            "mcp": mcp_data
+        }
 
-    if looks_like_html:
-        logging.debug(f"{http_response.url} looks like HTML, skipping")
-        return None
+    # If no valid mcp.json found on either host, return None
+    return None
 
-    # heuristic check for JSON content in body
-    looks_like_json = body_snippet.startswith(b"{") or body_snippet.startswith(b"[")
-    if "json" not in content_type and not looks_like_json:
-        logging.debug(f"{http_response.url} content-type is not JSON ({content_type}), skipping")
-        return None
+def main():
+    # get domains from Tranco list
+    # reference: https://tranco-list.eu/
+    t = Tranco(cache=True, cache_dir='.tranco')
+    latest_list = t.list()
+    domains = latest_list.top(TOPX)
+    logging.info(f"Loaded {len(domains)} domains from Tranco list.")
+    start_time = time.time()
+    processed = 0
 
-    # final proof attempt to parse JSON
-    try:
-        mcp_content = http_response.json()
-    except ValueError:
-        logging.debug("Response is not valid JSON")
-        return None
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor, open(OUTPUT_FILE, "w") as out:
+        future_to_domain = {executor.submit(check_mcp_json, domain): domain for domain in domains}
+        for future in as_completed(future_to_domain):
+            result = future.result()
+            processed += 1
+            if result:
+                out.write(json.dumps(result, ensure_ascii=False) + "\n")
+            if processed % 10 == 0:
+                elapsed = time.time() - start_time
+                logging.info(f"Processed {processed} domains in {elapsed:.2f} seconds ({processed/elapsed:.2f} domains/sec)")
 
-    return mcp_content
+    elapsed = time.time() - start_time
+    logging.info(f"Results written to {OUTPUT_FILE}")
+    logging.info(f"Processed {processed} domains in {elapsed:.2f} seconds ({processed/elapsed:.2f} domains/sec)")
 
-#
-# main()
-#
-
-mydomain = "notion.com"  # replace with your target domain
-mcp_response = None
-
-# only check apex domain and www. host for mcp.json
-mcp_response = fetch_mcp_json(mydomain)
-if not mcp_response:
-    mcp_response = fetch_mcp_json("www." + mydomain)
-
-if not mcp_response:
-    logging.info(f"No mcp.json found at {mydomain} or www.{mydomain}")
-    sys.exit(0)
-
-mcp_data = validate_and_parse_mcp_json(mcp_response)
-if mcp_data:
-    logging.info(f"Found mcp.json at {mcp_response.url}")
-    logging.debug(json.dumps(mcp_data, indent=2))
-else:
-    logging.info(f"No valid mcp.json found at {mcp_response.url}")
-    sys.exit(0)
+if __name__ == "__main__":
+    main()

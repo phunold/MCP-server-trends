@@ -1,0 +1,1 @@
+{"domain": "sentry.io", "mcp_url": "https://sentry.io/.well-known/mcp.json", "mcp": {"name": "Sentry", "description": "Connect to Sentry, debug faster.", "endpoint": "https://mcp.sentry.dev/mcp"}}
