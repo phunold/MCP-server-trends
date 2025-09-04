@@ -1,7 +1,6 @@
 import requests
 import json
 
-
 domain = "notion.com"
 url = f"https://crt.sh/?q=%25.{domain}&output=json"
 
@@ -73,5 +72,5 @@ for host in sorted(hosts):
     print(f"Found mcp.json at {mcp_url}")
     print(f"MCP endpoint: {mcp_data.get("endpoint")}")
 
-    
+
     #print(json.dumps(data, indent=2, ensure_ascii=False))
