@@ -1,0 +1,6 @@
+{
+	"name": "Notion",
+	"description": "Connect your Notion workspace to search, update, and trigger workflows across tools.",
+	"icon": "https://www.notion.so/images/notion-logo-block-main.svg",
+	"endpoint": "https://mcp.notion.com/mcp"
+}

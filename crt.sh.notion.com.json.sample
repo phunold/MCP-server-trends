@@ -1,0 +1,62 @@
+{
+issuer_ca_id: 286242,
+issuer_name: "C=US, O=Google Trust Services, CN=WR1",
+common_name: "info.notion.com",
+name_value: "info.notion.com",
+id: 20758909817,
+entry_timestamp: "2025-09-03T04:49:27.121",
+not_before: "2025-09-03T03:49:26",
+not_after: "2025-12-02T04:47:52",
+serial_number: "734c7f867674903a0dbc5ca21a0925c1",
+result_count: 2
+},
+{
+issuer_ca_id: 247106,
+issuer_name: "C=US, O=Amazon, CN=Amazon RSA 2048 M03",
+common_name: "notion.com",
+name_value: "api.notion.com
+integrations-api.notion.com
+notion.com",
+id: 20754526246,
+entry_timestamp: "2025-09-03T00:19:57.063",
+not_before: "2025-09-03T00:00:00",
+not_after: "2026-10-02T23:59:59",
+serial_number: "0bd045a8e96b3d74b8462106f97db7d1",
+result_count: 4
+},
+{
+issuer_ca_id: 286236,
+issuer_name: "C=US, O=Google Trust Services, CN=WE1",
+common_name: "*.dev.notion.com",
+name_value: "*.dev.notion.com",
+id: 20733607111,
+entry_timestamp: "2025-09-02T01:15:11.321",
+not_before: "2025-09-02T00:15:10",
+not_after: "2025-12-01T01:15:09",
+serial_number: "00c38aa78123338836114e4652cc57e1c9",
+result_count: 2
+},
+{
+issuer_ca_id: 286242,
+issuer_name: "C=US, O=Google Trust Services, CN=WR1",
+common_name: "*.dev.notion.com",
+name_value: "*.dev.notion.com",
+id: 20733613327,
+entry_timestamp: "2025-09-02T01:15:00.069",
+not_before: "2025-09-02T00:14:59",
+not_after: "2025-12-01T01:12:47",
+serial_number: "00ef87fc8b112757520da4c087e60fa4e1",
+result_count: 2
+},
+{
+issuer_ca_id: 286236,
+issuer_name: "C=US, O=Google Trust Services, CN=WE1",
+common_name: "*.prod.notion.com",
+name_value: "*.prod.notion.com",
+id: 20733613438,
+entry_timestamp: "2025-09-02T01:14:59.75",
+not_before: "2025-09-02T00:14:59",
+not_after: "2025-12-01T01:14:55",
+serial_number: "5810e479bc750b631329cddb43342fb8",
+result_count: 2
+}
