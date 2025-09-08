@@ -7,7 +7,7 @@ Usage:
 from __future__ import annotations
 import argparse, html, json, pathlib
 from statistics import mean
-from common import ensure_dir, read_jsonl
+from app.common import ensure_dir, read_jsonl
 
 TEMPLATE = """<!doctype html>
 <html><head>

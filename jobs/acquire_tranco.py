@@ -13,7 +13,7 @@ from typing import List
 import sys
 
 from tranco import Tranco
-from common import ensure_dir
+from app.common import ensure_dir
 
 def get_tranco_domains(top_n: int) -> List[str]:
     """

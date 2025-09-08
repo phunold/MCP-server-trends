@@ -20,7 +20,7 @@ import time
 from urllib.parse import urlparse
 
 import httpx
-from common import ensure_dir, now_iso, write_jsonl
+from app.common import ensure_dir, now_iso, write_jsonl
 
 BASE_URL = "https://api.pulsemcp.com/v0beta/servers"
 UA = "mcp-server-trends/0.1 (+https://github.com/phunold/MCP-server-trends)"

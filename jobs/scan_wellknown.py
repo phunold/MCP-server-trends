@@ -15,7 +15,7 @@ from __future__ import annotations
 import argparse, asyncio, json, pathlib, re, sys, typing as t
 import httpx
 
-from common import (ScanResult, ensure_dir, now_iso, sha256_bytes, write_jsonl,
+from app.common import (ScanResult, ensure_dir, now_iso, sha256_bytes, write_jsonl,
                     DEFAULT_TIMEOUT, USER_AGENT)
 
 WELLKNOWN_PATHS = [

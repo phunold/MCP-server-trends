@@ -7,7 +7,7 @@ Usage:
 from __future__ import annotations
 import argparse, csv, pathlib, re
 from collections import Counter, defaultdict
-from common import RUNS_DIR, SUMMARIES_DIR, read_jsonl, ensure_dir
+from app.common import RUNS_DIR, SUMMARIES_DIR, read_jsonl, ensure_dir
 
 def iter_scan_results(runs_dir: pathlib.Path):
     for day_dir in sorted(runs_dir.glob("*")):
