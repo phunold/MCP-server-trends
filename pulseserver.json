@@ -1,0 +1,24 @@
+{
+    "servers": [
+        {
+            "name": "Activepieces",
+            "url": "https://www.pulsemcp.com/servers/activepieces",
+            "external_url": "https://www.activepieces.com/",
+            "short_description": "Dynamic server to which you can add apps (Google Calendar, Notion, etc) or advanced Activepieces Flows (Refund logic, a research and enrichment logic, etc).",
+            "source_code_url": "https://github.com/activepieces/activepieces",
+            "github_stars": 17625,
+            "package_registry": "npm",
+            "package_name": "@activepieces/piece-mcp",
+            "package_download_count": 2422,
+            "EXPERIMENTAL_ai_generated_description": "Connect to your hosted MCP Server using any MCP client to communicate with tools",
+            "remotes": [
+                {
+                    "url_direct": null,
+                    "url_setup": "https://www.activepieces.com/docs/ai/mcp",
+                    "transport": "sse",
+                    "authentication_method": "oauth",
+                    "cost": "free_tier"
+                }
+            ]
+        }
+    ]

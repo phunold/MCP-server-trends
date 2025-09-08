@@ -5,6 +5,9 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "httpx>=0.28.1",
+    "matplotlib>=3.10.6",
     "requests>=2.32.5",
+    "streamlit>=1.49.1",
     "tranco>=0.8.1",
 ]

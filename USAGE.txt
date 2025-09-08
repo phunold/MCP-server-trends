@@ -1,0 +1,28 @@
+# 1) Pick a run dir
+RUN=2025-09-06
+mkdir -p data/runs/$RUN
+
+# 2) Get top-N domains
+python -m src.acquire_tranco --top 10000 --out data/runs/$RUN/domains_tranco_topN.txt
+
+# 3) (Optional) Get registry seeds
+python -m src.acquire_registry \
+  --url https://raw.githubusercontent.com/modelcontextprotocol/registry/main/registry.json \
+  --out data/runs/$RUN/registry_seeds.jsonl
+
+# 4) Scan Tranco
+python -m src.scan_wellknown \
+  --domains data/runs/$RUN/domains_tranco_topN.txt \
+  --seed-source tranco \
+  --out data/runs/$RUN/scan_results.jsonl
+
+# 5) Scan Registry (if you want to merge, append to the same JSONL)
+jq -r .target data/runs/$RUN/registry_seeds.jsonl | sort -u > /tmp/registry_targets.txt
+python -m src.scan_wellknown \
+  --domains /tmp/registry_targets.txt \
+  --seed-source registry \
+  --out data/runs/$RUN/scan_results.jsonl
+
+# 6) Summaries & report
+python -m src.metrics --runs-dir data/runs --out-csv data/summaries/adoption_daily.csv
+python -m src.report --run-dir data/runs/$RUN --out reports/$RUN/index.html

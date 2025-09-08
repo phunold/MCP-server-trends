@@ -5,14 +5,16 @@ import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import os
 import time
+import random
 
 # setup logging
 logging.basicConfig(level=logging.INFO)
+#logging.basicConfig(level=logging.DEBUG)
 
 # configuration
-TOPX = 10000  # number of top domains to process from Tranco list
+TOPX = 100000  # number of top domains to process from Tranco list
 OUTPUT_FILE = "mcp_results.jsonl"  # each line is a JSON object
-MAX_WORKERS = 32
+MAX_WORKERS = 128
 
 def check_mcp_json(domain):
     """
@@ -25,6 +27,8 @@ def check_mcp_json(domain):
             - mcp (dict): The parsed JSON content of mcp.json
     """
     for host in [domain, f"www.{domain}"]:
+        logging.debug(f"Checking {host} for mcp.json")
+
         mcp_url = f"https://{host}/.well-known/mcp.json"
         try:
             resp = requests.get(
@@ -33,7 +37,7 @@ def check_mcp_json(domain):
                 allow_redirects=True,
                 headers={"Accept": "application/json, */*;q=0.7", "User-Agent": "mcp-check/0.1"}
             )
-        except requests.RequestException as e:
+        except (requests.RequestException, requests.urllib3.exceptions.LocationParseError) as e:
             logging.debug(f"{mcp_url} request error: {e}")
             continue
 
@@ -80,6 +84,9 @@ def main():
     t = Tranco(cache=True, cache_dir='.tranco')
     latest_list = t.list()
     domains = latest_list.top(TOPX)
+    # shuffle domains to spread load
+    random.shuffle(domains)
+
     logging.info(f"Loaded {len(domains)} domains from Tranco list.")
     start_time = time.time()
     processed = 0
@@ -91,7 +98,7 @@ def main():
             processed += 1
             if result:
                 out.write(json.dumps(result, ensure_ascii=False) + "\n")
-            if processed % 10 == 0:
+            if processed % 100 == 0:
                 elapsed = time.time() - start_time
                 logging.info(f"Processed {processed} domains in {elapsed:.2f} seconds ({processed/elapsed:.2f} domains/sec)")
 
