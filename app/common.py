@@ -2,7 +2,7 @@
 Common utilities and types used across the project.
 """
 from __future__ import annotations
-import hashlib, json, pathlib, time
+import hashlib, json, pathlib, time, httpx
 from dataclasses import dataclass, asdict
 from typing import Any, Dict, Iterable, Optional
 
@@ -13,6 +13,8 @@ REPORTS_DIR = pathlib.Path("reports")
 
 DEFAULT_TIMEOUT = 10.0  # seconds
 USER_AGENT = "mcp-server-trends/0.1 (+https://github.com/phunold/MCP-server-trends)"
+HTTPX_LIMITS = httpx.Limits(max_connections=5000, max_keepalive_connections=1000)
+HTTPX_TIMEOUT = httpx.Timeout(connect=4.0, read=4.0, write=4.0, pool=4.0)
 
 def ensure_dir(p: pathlib.Path) -> None:
     p.mkdir(parents=True, exist_ok=True)
@@ -40,7 +42,6 @@ def read_jsonl(path: pathlib.Path) -> Iterable[Dict[str, Any]]:
 @dataclass
 class ScanResult:
     run_ts: str
-    seed_source: str           # "tranco" | "registry"
     domain: str
     url: str
     status: int
@@ -49,9 +50,6 @@ class ScanResult:
     etag: Optional[str] = None
     last_modified: Optional[str] = None
     sha256: Optional[str] = None
-    auth: Optional[str] = None                 # "none" | "api_key" | "oauth2" | "unknown"
-    tls_grade: Optional[str] = None            # placeholder grade
-    exposure_flags: Optional[list[str]] = None
     manifest_sample: Optional[Dict[str, Any]] = None
     notes: Optional[list[str]] = None
 
