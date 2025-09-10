@@ -50,6 +50,8 @@ class ScanResult:
     etag: Optional[str] = None
     last_modified: Optional[str] = None
     sha256: Optional[str] = None
+    ttfb_ms: Optional[float] = None
+    total_ms: Optional[float] = None
     manifest_sample: Optional[Dict[str, Any]] = None
     notes: Optional[list[str]] = None
 
