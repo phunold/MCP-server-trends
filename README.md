@@ -183,6 +183,21 @@ python -m mcp_trends report --from data/runs/ --to reports/
 streamlit run src/dashboard.py
 ```
 
+## Demo Data
+
+To quickly try the Streamlit app without running a full scan, generate a small demo dataset (uses test fixtures and adds a few synthetic rows):
+
+```bash
+# Option A: via Makefile
+make demo-data
+
+# Option B: direct script usage (overwrites optional)
+python jobs/init_demo_data.py --out-dir data/runs/$(date -u +%F) [--overwrite]
+
+# Then launch the app
+streamlit run app/Home.py
+```
+
 ## Roadmap & Future Improvements
 
 * Spec awareness — support alternate discovery paths.
