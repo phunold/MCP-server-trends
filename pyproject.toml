@@ -16,6 +16,8 @@ dependencies = [
   "pydantic",
   "tenacity",
   "tranco",
+  "altair>=5.5.0",
+  "python-dateutil>=2.9.0.post0",
 ]
 
 [tool.setuptools.packages.find]

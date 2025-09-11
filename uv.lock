@@ -328,9 +328,11 @@ name = "mcp-server-trends"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "altair" },
     { name = "httpx", extra = ["http2"] },
     { name = "pandas" },
     { name = "pydantic" },
+    { name = "python-dateutil" },
     { name = "streamlit" },
     { name = "tenacity" },
     { name = "tranco" },
@@ -338,9 +340,11 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "altair", specifier = ">=5.5.0" },
     { name = "httpx", extras = ["http2"] },
     { name = "pandas" },
     { name = "pydantic" },
+    { name = "python-dateutil", specifier = ">=2.9.0.post0" },
     { name = "streamlit" },
     { name = "tenacity" },
     { name = "tranco" },
